@@ -5,6 +5,7 @@
 #include <QDialog>
 #include <QSharedPointer>
 
+
 class QLineEdit;
 class QCustomPlot;
 class QPushButton;
@@ -13,14 +14,21 @@ class UdpListener;
 namespace QtCharts{
     class QChart;
     class QChartView;
+    class QValueAxis;
+    class QLineSeries;
+    class QScatterSeries;
 }
 class ViewerDialog : public QDialog
 {
     Q_OBJECT
 private:
     const qint32 samplesSize_  {4096};
-    QtCharts::QChart* chartPtr            {nullptr};
-    QtCharts::QChartView* chartViewPtr_   {nullptr};
+    QtCharts::QChart* chartPtr_             {nullptr};
+    QtCharts::QChartView* chartViewPtr_     {nullptr};
+    QtCharts::QLineSeries* graphSeriesPtr_  {nullptr};
+    QtCharts::QLineSeries* medianSeriesPtr_ {nullptr};
+    QtCharts::QValueAxis* xAxesPtr_         {nullptr};
+    QtCharts::QValueAxis* yAxesPtr_         {nullptr};
 
     QPushButton* startBtnPtr_   {nullptr};
     QPushButton* stopBtnPtr_    {nullptr};

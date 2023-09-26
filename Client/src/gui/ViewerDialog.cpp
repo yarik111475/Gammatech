@@ -8,16 +8,30 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QtCharts/QValueAxis>
 #include <algorithm>
 #include <numeric>
+#include <limits.h>
 
 QT_CHARTS_USE_NAMESPACE
 
 ViewerDialog::ViewerDialog(QWidget *parent):QDialog{parent}
 {
-    chartPtr=new QChart;
-    chartViewPtr_=new QChartView{chartPtr};
+    chartPtr_=new QChart;
+    chartPtr_->legend()->hide();
+
+    chartViewPtr_=new QChartView{chartPtr_};
     chartViewPtr_->setRenderHint(QPainter::Antialiasing);
+
+    xAxesPtr_=new QValueAxis;
+    xAxesPtr_->setRange(0,4096);
+    xAxesPtr_->setTickCount(10);
+    chartPtr_->addAxis(xAxesPtr_,Qt::AlignBottom);
+
+    yAxesPtr_=new QValueAxis;
+    yAxesPtr_->setRange(0,USHRT_MAX);
+    yAxesPtr_->setTickCount(10);
+    chartPtr_->addAxis(yAxesPtr_,Qt::AlignLeft);
 
     startBtnPtr_=new QPushButton{QObject::tr("Start")};
     QObject::connect(startBtnPtr_,&QPushButton::clicked,[&](){
@@ -37,11 +51,11 @@ ViewerDialog::ViewerDialog(QWidget *parent):QDialog{parent}
     });
     zoomInBtnPtr_=new QPushButton{QObject::tr("Zoom In")};
     QObject::connect(zoomInBtnPtr_,&QPushButton::clicked,[&](){
-        chartPtr->zoomIn();
+        chartPtr_->zoomIn();
     });
     zoomOutBtnPtr_=new QPushButton{QObject::tr("Soom Out")};
     QObject::connect(zoomOutBtnPtr_,&QPushButton::clicked,[&](){
-        chartPtr->zoomOut();
+        chartPtr_->zoomOut();
     });
     logLineEditPtr_=new QLineEdit;
     logLineEditPtr_->setReadOnly(true);
@@ -65,7 +79,6 @@ ViewerDialog::ViewerDialog(QWidget *parent):QDialog{parent}
 
 void ViewerDialog::datagramSlot(const QString &senderAddress, qint32 senderPort, const QByteArray datagramData)
 {
-    qDebug()<<datagramData.size();
     int index {0};
     QByteArray tempData {datagramData};
     QVector<double> samplesList {};
@@ -75,18 +88,19 @@ void ViewerDialog::datagramSlot(const QString &senderAddress, qint32 senderPort,
     if(secondPartIt!=tempData.end()){
         auto firstPartIt {tempData.begin()};
         while(secondPartIt!=tempData.end()){
-            const int sample {static_cast<quint16>(*firstPartIt) * 0x100 + (*secondPartIt)};
+            const int sample {static_cast<int>(*firstPartIt) * 0x100 + (*secondPartIt)};
             samplesList.push_back(static_cast<double>(sample & 0xFFFF));
             firstPartIt++;
             secondPartIt++;
         }
     }
 
-    if(chartPtr->series().size()!=0){
-        chartPtr->removeAllSeries();
-    }
     QScatterSeries* maxSeriesPtr {new QScatterSeries};
+    maxSeriesPtr->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    maxSeriesPtr->setMarkerSize(20);
+
     QLineSeries* graphSeriesPtr {new QLineSeries};
+    graphSeriesPtr->setPointLabelsClipping(false);
     QLineSeries* medianSeriesPtr {new QLineSeries};
 
     QPen medianSeriesPen {medianSeriesPtr->pen()};
@@ -98,6 +112,10 @@ void ViewerDialog::datagramSlot(const QString &senderAddress, qint32 senderPort,
     const double max {*std::max_element(samplesList.begin(),samplesList.end())};
     const double sum {std::accumulate(samplesList.begin(),samplesList.end(),0.0,std::plus<double>())};
     const double average {sum/samplesList.size()};
+
+    if(chartPtr_->series().size()!=0){
+        chartPtr_->removeAllSeries();
+    }
     for(int i=0;i<samplesList.size();++i){
         *graphSeriesPtr<<QPointF(i,samplesList.at(i));
         *medianSeriesPtr<<QPointF(i,average);
@@ -106,8 +124,16 @@ void ViewerDialog::datagramSlot(const QString &senderAddress, qint32 senderPort,
         }
     }
 
-    chartPtr->addSeries(graphSeriesPtr);
-    chartPtr->addSeries(medianSeriesPtr);
-    chartPtr->addSeries(maxSeriesPtr);
-    chartPtr->createDefaultAxes();
+    chartPtr_->addSeries(graphSeriesPtr);
+    chartPtr_->addSeries(medianSeriesPtr);
+    chartPtr_->addSeries(maxSeriesPtr);
+
+    graphSeriesPtr->attachAxis(xAxesPtr_);
+    graphSeriesPtr->attachAxis(yAxesPtr_);
+
+    medianSeriesPtr->attachAxis(xAxesPtr_);
+    medianSeriesPtr->attachAxis(yAxesPtr_);
+
+    maxSeriesPtr->attachAxis(xAxesPtr_);
+    maxSeriesPtr->attachAxis(yAxesPtr_);
 }
