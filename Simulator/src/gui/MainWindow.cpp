@@ -13,9 +13,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
     {
         sliderPtr_.reset(new QSlider);
-        sliderPtr_->setRange(5,100);
+        sliderPtr_->setRange(5,1000);
         sliderPtr_->setTickPosition(QSlider::TicksBelow);
-        sliderPtr_->setTickInterval(10);
+        sliderPtr_->setTickInterval(200);
         sliderPtr_->setOrientation(Qt::Horizontal);
         periodLblPtr_.reset(new QLabel);
         QObject::connect(sliderPtr_.get(),&QSlider::valueChanged,[&](int value){
@@ -31,16 +31,22 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
         QObject::connect(startBtnPtr_.get(),&QPushButton::clicked,[&](){
             if(udpServerPtr_ && udpServerPtr_->isRunning()){
                 udpServerPtr_.reset();
+                startBtnPtr_->setText(QObject::tr("Start"));
             }
-            udpServerPtr_.reset(new UdpServer{sliderPtr_->value()});
-            QObject::connect(udpServerPtr_.get(),&UdpServer::progressSignal,this,&MainWindow::progressSlot);
-            udpServerPtr_->start();
+            else{
+                udpServerPtr_.reset(new UdpServer{sliderPtr_->value()});
+                QObject::connect(udpServerPtr_.get(),&UdpServer::progressSignal,this,&MainWindow::progressSlot);
+                udpServerPtr_->start();
+                startBtnPtr_->setText(QObject::tr("Stop"));
+            }
         });
-        stopBtnPtr_.reset(new QPushButton(QObject::tr("Stop")));
+        stopBtnPtr_.reset(new QPushButton(QObject::tr("Reset")));
         QObject::connect(stopBtnPtr_.get(),&QPushButton::clicked,[&](){
             textEditPtr_->clear();
             if(udpServerPtr_ && udpServerPtr_->isRunning()){
-                udpServerPtr_.reset();
+                udpServerPtr_.reset(new UdpServer{sliderPtr_->value()});
+                QObject::connect(udpServerPtr_.get(),&UdpServer::progressSignal,this,&MainWindow::progressSlot);
+                udpServerPtr_->start();
             }
         });
 
@@ -57,7 +63,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
         QVBoxLayout*vboxLayoutPtr {new QVBoxLayout};
         vboxLayoutPtr->addWidget(textEditPtr_.get());
         vboxLayoutPtr->addLayout(hboxLayoutPtr);
-
         setLayout(vboxLayoutPtr);
     }
     setWindowTitle(QObject::tr("Simulator"));
@@ -65,6 +70,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
 MainWindow::~MainWindow()
 {
+    if(udpServerPtr_ && udpServerPtr_->isRunning()){
+        udpServerPtr_.reset();
+    }
 }
 
 void MainWindow::progressSlot(qint32 value)

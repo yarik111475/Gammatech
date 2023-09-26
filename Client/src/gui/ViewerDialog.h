@@ -38,6 +38,7 @@ private:
     QSharedPointer<UdpListener> udpListenerPtr_ {nullptr};
 public:
     explicit ViewerDialog(QWidget* parent=nullptr);
+    ~ViewerDialog();
 
 public Q_SLOTS:
     void datagramSlot(const QString& senderAddress,qint32 senderPort,const QByteArray datagramData);

@@ -77,6 +77,13 @@ ViewerDialog::ViewerDialog(QWidget *parent):QDialog{parent}
     resize(800,600);
 }
 
+ViewerDialog::~ViewerDialog()
+{
+    if(udpListenerPtr_ && udpListenerPtr_->isRunning()){
+        udpListenerPtr_.reset();
+    }
+}
+
 void ViewerDialog::datagramSlot(const QString &senderAddress, qint32 senderPort, const QByteArray datagramData)
 {
     int index {0};

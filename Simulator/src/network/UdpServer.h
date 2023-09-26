@@ -13,7 +13,7 @@ private:
     const qint32       hostPort_ {10002};
     const QHostAddress hostAddress_ {QHostAddress::LocalHost};
     const qint32       datagramSize_ {8192};
-    const qint32       scaleFactor_ {100};
+    const qint32       scaleFactor_ {1};
 
     qint32 timeOut_ {};
     qint32 datagramCounter_ {};
