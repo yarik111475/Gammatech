@@ -14,11 +14,11 @@ class MainWindow : public QWidget
     Q_OBJECT
 
 private:
-    QSharedPointer<QSlider>     sliderPtr_    {nullptr};
-    QSharedPointer<QLabel>      periodLblPtr_ {nullptr};
-    QSharedPointer<QTextEdit>   textEditPtr_  {nullptr};
-    QSharedPointer<QPushButton> startBtnPtr_  {nullptr};
-    QSharedPointer<QPushButton> stopBtnPtr_   {nullptr};
+    QSlider*     sliderPtr_    {nullptr};
+    QLabel*      periodLblPtr_ {nullptr};
+    QTextEdit*   textEditPtr_  {nullptr};
+    QPushButton* startBtnPtr_  {nullptr};
+    QPushButton* stopBtnPtr_   {nullptr};
     QSharedPointer<UdpServer>   udpServerPtr_ {nullptr};
 
 public:

@@ -5,7 +5,7 @@
 #include <QDialog>
 #include <QSharedPointer>
 
-
+class QLabel;
 class QLineEdit;
 class QCustomPlot;
 class QPushButton;
@@ -32,9 +32,7 @@ private:
 
     QPushButton* startBtnPtr_   {nullptr};
     QPushButton* stopBtnPtr_    {nullptr};
-    QPushButton* zoomInBtnPtr_  {nullptr};
-    QPushButton* zoomOutBtnPtr_ {nullptr};
-    QLineEdit* logLineEditPtr_  {nullptr};
+    QLabel*      logLabelPtr_   {nullptr};
     QSharedPointer<UdpListener> udpListenerPtr_ {nullptr};
 public:
     explicit ViewerDialog(QWidget* parent=nullptr);

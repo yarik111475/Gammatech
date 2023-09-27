@@ -10,9 +10,15 @@
 
 void UdpServer::run()
 {
-   socketPtr_.reset(new QUdpSocket);
-   startSlot();
-   QThread::exec();
+
+    socketPtr_.reset(new QUdpSocket);
+    QObject::connect(this,&UdpServer::finished,[&](){
+        if(socketPtr_){
+            socketPtr_.reset();
+        }
+    });
+    startSlot();
+    QThread::exec();
 }
 
 UdpServer::UdpServer(qint32 timeOut, QObject *parent)
@@ -45,6 +51,7 @@ void UdpServer::startSlot()
 
 void UdpServer::destructSlot()
 {
+
     QThread::quit();
     QThread::wait();
 }

@@ -42,31 +42,25 @@ ViewerDialog::ViewerDialog(QWidget *parent):QDialog{parent}
         QObject::connect(udpListenerPtr_.get(),&UdpListener::datagramSignal,
                          this,&ViewerDialog::datagramSlot);
         udpListenerPtr_->start();
+        logLabelPtr_->setText(QObject::tr("Listen"));
     });
     stopBtnPtr_=new QPushButton{QObject::tr("Stop")};
     QObject::connect(stopBtnPtr_,&QPushButton::clicked,[&](){
+        logLabelPtr_->setText(QObject::tr("Wait"));
         if(udpListenerPtr_ && udpListenerPtr_->isRunning()){
             udpListenerPtr_.reset();
         }
     });
-    zoomInBtnPtr_=new QPushButton{QObject::tr("Zoom In")};
-    QObject::connect(zoomInBtnPtr_,&QPushButton::clicked,[&](){
-        chartPtr_->zoomIn();
-    });
-    zoomOutBtnPtr_=new QPushButton{QObject::tr("Soom Out")};
-    QObject::connect(zoomOutBtnPtr_,&QPushButton::clicked,[&](){
-        chartPtr_->zoomOut();
-    });
-    logLineEditPtr_=new QLineEdit;
-    logLineEditPtr_->setReadOnly(true);
+
+    logLabelPtr_=new QLabel;
+    logLabelPtr_->setText(QObject::tr("Wait"));
 
     QHBoxLayout* hboxLauoutPtr {new QHBoxLayout};
     hboxLauoutPtr->addWidget(new QLabel(QObject::tr("Status:")));
-    hboxLauoutPtr->addWidget(logLineEditPtr_);
+    hboxLauoutPtr->addWidget(logLabelPtr_);
+    hboxLauoutPtr->addStretch(100);
     hboxLauoutPtr->addWidget(startBtnPtr_);
     hboxLauoutPtr->addWidget(stopBtnPtr_);
-    //hboxLauoutPtr->addWidget(zoomInBtnPtr_);
-    //hboxLauoutPtr->addWidget(zoomOutBtnPtr_);
 
     QVBoxLayout* vboxLayoutPtr {new QVBoxLayout};
     vboxLayoutPtr->addWidget(chartViewPtr_,10);
@@ -74,6 +68,7 @@ ViewerDialog::ViewerDialog(QWidget *parent):QDialog{parent}
 
     setLayout(vboxLayoutPtr);
     setWindowTitle("Wave Viewer");
+    setWindowFlags(Qt::Window);
     resize(800,600);
 }
 

@@ -31,6 +31,7 @@ private Q_SLOTS:
 
 public Q_SLOTS:
     void timeoutSlot(qint32 value);
+
 Q_SIGNALS:
     void progressSignal(qint32 value);
 };

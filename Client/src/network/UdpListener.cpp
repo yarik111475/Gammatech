@@ -9,6 +9,11 @@
 void UdpListener::run()
 {
     socketPtr_.reset(new QUdpSocket);
+    QObject::connect(this,&UdpListener::finished,[&](){
+        if(socketPtr_){
+            socketPtr_.reset();
+        }
+    });
     QObject::connect(socketPtr_.get(),&QUdpSocket::readyRead,[&](){
         while(socketPtr_->hasPendingDatagrams()){
             const qint64& datagramSize {socketPtr_->pendingDatagramSize()};

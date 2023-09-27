@@ -19,7 +19,7 @@ find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS Network REQUIRED)
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
   ${PROJECT_SOURCES}
 )
 

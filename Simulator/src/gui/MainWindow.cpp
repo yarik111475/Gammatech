@@ -12,13 +12,13 @@
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
     {
-        sliderPtr_.reset(new QSlider);
+        sliderPtr_=new QSlider;
         sliderPtr_->setRange(5,1000);
         sliderPtr_->setTickPosition(QSlider::TicksBelow);
         sliderPtr_->setTickInterval(200);
         sliderPtr_->setOrientation(Qt::Horizontal);
-        periodLblPtr_.reset(new QLabel);
-        QObject::connect(sliderPtr_.get(),&QSlider::valueChanged,[&](int value){
+        periodLblPtr_=new QLabel;
+        QObject::connect(sliderPtr_,&QSlider::valueChanged,[&](int value){
             periodLblPtr_->setText(QString("%1 ms").arg(value));
             if(udpServerPtr_){
                 udpServerPtr_->timeoutSlot(value);
@@ -27,8 +27,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
         sliderPtr_->setValue(5);
         periodLblPtr_->setText(QString("%1 ms").arg(sliderPtr_->value()));
 
-        startBtnPtr_.reset(new QPushButton(QObject::tr("Start")));
-        QObject::connect(startBtnPtr_.get(),&QPushButton::clicked,[&](){
+        startBtnPtr_=new QPushButton(QObject::tr("Start"));
+        QObject::connect(startBtnPtr_,&QPushButton::clicked,[&](){
             if(udpServerPtr_ && udpServerPtr_->isRunning()){
                 udpServerPtr_.reset();
                 startBtnPtr_->setText(QObject::tr("Start"));
@@ -40,8 +40,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
                 startBtnPtr_->setText(QObject::tr("Stop"));
             }
         });
-        stopBtnPtr_.reset(new QPushButton(QObject::tr("Reset")));
-        QObject::connect(stopBtnPtr_.get(),&QPushButton::clicked,[&](){
+        stopBtnPtr_=new QPushButton(QObject::tr("Reset"));
+        QObject::connect(stopBtnPtr_,&QPushButton::clicked,[&](){
             textEditPtr_->clear();
             if(udpServerPtr_ && udpServerPtr_->isRunning()){
                 udpServerPtr_.reset(new UdpServer{sliderPtr_->value()});
@@ -52,17 +52,17 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
         QHBoxLayout* hboxLayoutPtr {new QHBoxLayout};
         hboxLayoutPtr->addWidget(new QLabel(QObject::tr("Period:")));
-        hboxLayoutPtr->addWidget(periodLblPtr_.get());
-        hboxLayoutPtr->addWidget(sliderPtr_.get());
-        hboxLayoutPtr->addWidget(startBtnPtr_.get());
-        hboxLayoutPtr->addWidget(stopBtnPtr_.get());
+        hboxLayoutPtr->addWidget(periodLblPtr_);
+        hboxLayoutPtr->addWidget(sliderPtr_);
+        hboxLayoutPtr->addWidget(startBtnPtr_);
+        hboxLayoutPtr->addWidget(stopBtnPtr_);
 
-        textEditPtr_.reset(new QTextEdit);
+        textEditPtr_=new QTextEdit;
         textEditPtr_->setReadOnly(true);
 
         QVBoxLayout*vboxLayoutPtr {new QVBoxLayout};
-        vboxLayoutPtr->addWidget(textEditPtr_.get());
-        vboxLayoutPtr->addLayout(hboxLayoutPtr);
+        vboxLayoutPtr->addWidget(textEditPtr_,0);
+        vboxLayoutPtr->addLayout(hboxLayoutPtr,0);
         setLayout(vboxLayoutPtr);
     }
     setWindowTitle(QObject::tr("Simulator"));

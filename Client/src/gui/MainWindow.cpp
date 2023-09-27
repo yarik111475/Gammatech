@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QDialog>
 #include <QMenuBar>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -14,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         dialog.exec();
     });
     mainMenuPtr->addAction(QObject::tr("About"),[&](){
+        QMessageBox::about(this,"About","WaveViewer test program\nVersion 1.0.0");
     });
     menuBar()->addMenu(mainMenuPtr);
 }
